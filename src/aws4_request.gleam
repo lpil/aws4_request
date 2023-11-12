@@ -3,6 +3,7 @@ import gleam/http
 import gleam/http/request.{type Request, Request}
 import gleam/int
 import gleam/list
+import gleam/bit_array
 import gleam/option
 import gleam/string
 
@@ -19,7 +20,10 @@ pub fn sign(
   service service: String,
 ) -> Request(BitArray) {
   let payload_hash =
-    string.lowercase(hex(crypto.hash(crypto.Sha256, request.body)))
+    string.lowercase(bit_array.base16_encode(crypto.hash(
+      crypto.Sha256,
+      request.body,
+    )))
 
   let #(#(year, month, day), #(hour, minute, second)) = date_time
   let date =
@@ -81,7 +85,7 @@ pub fn sign(
       "\n",
       scope,
       "\n",
-      string.lowercase(hex(crypto.hash(
+      string.lowercase(bit_array.base16_encode(crypto.hash(
         crypto.Sha256,
         <<canonical_request:utf8>>,
       ))),
@@ -97,7 +101,7 @@ pub fn sign(
   let signature =
     <<to_sign:utf8>>
     |> crypto.hmac(crypto.Sha256, key)
-    |> hex
+    |> bit_array.base16_encode
     |> string.lowercase
 
   let authorization =
@@ -114,7 +118,3 @@ pub fn sign(
 
   Request(..request, headers: headers)
 }
-
-// TODO: remove once gleam_stdlib v0.32.0 is out
-@external(erlang, "binary", "encode_hex")
-fn hex(bits: BitArray) -> String
