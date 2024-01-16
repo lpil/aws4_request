@@ -20,10 +20,9 @@ pub fn sign(
   service service: String,
 ) -> Request(BitArray) {
   let payload_hash =
-    string.lowercase(bit_array.base16_encode(crypto.hash(
-      crypto.Sha256,
-      request.body,
-    )))
+    string.lowercase(
+      bit_array.base16_encode(crypto.hash(crypto.Sha256, request.body)),
+    )
 
   let #(#(year, month, day), #(hour, minute, second)) = date_time
   let date =
@@ -85,10 +84,11 @@ pub fn sign(
       "\n",
       scope,
       "\n",
-      string.lowercase(bit_array.base16_encode(crypto.hash(
-        crypto.Sha256,
-        <<canonical_request:utf8>>,
-      ))),
+      string.lowercase(
+        bit_array.base16_encode(
+          crypto.hash(crypto.Sha256, <<canonical_request:utf8>>),
+        ),
+      ),
     ])
 
   let key =
