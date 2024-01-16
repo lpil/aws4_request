@@ -3,8 +3,8 @@
 An AWS Signature Version 4 client implementation, useful for making
 authenticated requests to services such as AWS S3.
 
-[![Package Version](https://img.shields.io/hexpm/v/buckets)](https://hex.pm/packages/buckets)
-[![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/buckets/)
+[![Package Version](https://img.shields.io/hexpm/v/aws4_request)](https://hex.pm/packages/aws4_request)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/aws4_request/)
 
 ```sh
 gleam add aws4_request
