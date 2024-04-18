@@ -46,4 +46,4 @@ pub fn main() {
 }
 ```
 
-Further documentation can be found at <https://hexdocs.pm/buckets>.
+Further documentation can be found at <https://hexdocs.pm/aws4_request>.
