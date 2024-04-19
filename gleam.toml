@@ -1,5 +1,5 @@
 name = "aws4_request"
-version = "0.1.1"
+version = "0.2.0"
 gleam = ">= 0.32.0"
 description = "An AWS Signature Version 4 client implementation, used for S3 auth, etc"
 

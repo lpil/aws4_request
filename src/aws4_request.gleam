@@ -9,9 +9,8 @@ import gleam/string
 
 // TODO: document
 // TODO: document params
-// https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-auth-using-authorization-header.html
-// https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-header-based-auth.html
-pub fn sign(
+// https://docs.aws.amazon.com/IAM/latest/UserGuide/create-signed-request.html
+pub fn sign_bits(
   request request: Request(BitArray),
   date_time date_time: #(#(Int, Int, Int), #(Int, Int, Int)),
   access_key_id access_key_id: String,
@@ -19,10 +18,48 @@ pub fn sign(
   region region: String,
   service service: String,
 ) -> Request(BitArray) {
+  sign(
+    request,
+    request.body,
+    date_time,
+    access_key_id,
+    secret_access_key,
+    region,
+    service,
+  )
+}
+
+pub fn sign_string(
+  request request: Request(String),
+  date_time date_time: #(#(Int, Int, Int), #(Int, Int, Int)),
+  access_key_id access_key_id: String,
+  secret_access_key secret_access_key: String,
+  region region: String,
+  service service: String,
+) -> Request(String) {
+  let body_as_bit_array = bit_array.from_string(request.body)
+  sign(
+    request,
+    body_as_bit_array,
+    date_time,
+    access_key_id,
+    secret_access_key,
+    region,
+    service,
+  )
+}
+
+fn sign(
+  request request: Request(a),
+  body body: BitArray,
+  date_time date_time: #(#(Int, Int, Int), #(Int, Int, Int)),
+  access_key_id access_key_id: String,
+  secret_access_key secret_access_key: String,
+  region region: String,
+  service service: String,
+) -> Request(a) {
   let payload_hash =
-    string.lowercase(
-      bit_array.base16_encode(crypto.hash(crypto.Sha256, request.body)),
-    )
+    string.lowercase(bit_array.base16_encode(crypto.hash(crypto.Sha256, body)))
 
   let #(#(year, month, day), #(hour, minute, second)) = date_time
   let date =

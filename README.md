@@ -3,12 +3,17 @@
 An AWS Signature Version 4 client implementation, useful for making
 authenticated requests to services such as AWS S3.
 
+For more information on the AWS v4 signature see: [Create a signed AWS API request](https://docs.aws.amazon.com/IAM/latest/UserGuide/create-signed-request.html).
+
 [![Package Version](https://img.shields.io/hexpm/v/aws4_request)](https://hex.pm/packages/aws4_request)
 [![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/aws4_request/)
+
+Supports authentication with [access key](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html) credentials.
 
 ```sh
 gleam add aws4_request
 ```
+
 ```gleam
 import gleam/httpc
 import aws4_request
@@ -29,10 +34,10 @@ pub fn main() {
   let request =
     request
     |> request.set_method(http.Get)
-    |> request.set_body(<<>>)
+    |> request.set_body("")
 
   let signed_request =
-    aws4_request.sign(
+    aws4_request.sign_string(
       request,
       date_time,
       access_key_id,
