@@ -28,14 +28,9 @@ pub fn sign_test() {
     |> request.set_body(<<>>)
 
   let signed_request =
-    aws4_request.sign(
-      request,
-      date_time,
-      access_key_id,
-      secret_access_key,
-      region,
-      service,
-    )
+    aws4_request.signer(access_key_id:, secret_access_key:, region:, service:)
+    |> aws4_request.with_date_time(date_time)
+    |> aws4_request.sign_bits(request)
 
   signed_request.body
   |> should.equal(request.body)
@@ -91,14 +86,9 @@ pub fn sign_no_path_test() {
     |> request.set_body(<<>>)
 
   let signed_request =
-    aws4_request.sign(
-      request,
-      date_time,
-      access_key_id,
-      secret_access_key,
-      region,
-      service,
-    )
+    aws4_request.signer(access_key_id:, secret_access_key:, region:, service:)
+    |> aws4_request.with_date_time(date_time)
+    |> aws4_request.sign_bits(request)
 
   signed_request.body
   |> should.equal(request.body)

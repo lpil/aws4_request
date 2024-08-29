@@ -4,27 +4,77 @@ import gleam/http
 import gleam/http/request.{type Request, Request}
 import gleam/int
 import gleam/list
-import gleam/option
+import gleam/option.{type Option}
 import gleam/string
 
-// TODO: document
-// TODO: document params
-// https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-auth-using-authorization-header.html
-// https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-header-based-auth.html
-pub fn sign(
-  request request: Request(BitArray),
-  date_time date_time: #(#(Int, Int, Int), #(Int, Int, Int)),
+type DateTime =
+  #(#(Int, Int, Int), #(Int, Int, Int))
+
+pub type Signer {
+  Signer(
+    date_time: Option(DateTime),
+    access_key_id: String,
+    secret_access_key: String,
+    region: String,
+    service: String,
+  )
+}
+
+/// Create a new request signer for the given credentials, service, and region.
+///
+pub fn signer(
   access_key_id access_key_id: String,
   secret_access_key secret_access_key: String,
   region region: String,
   service service: String,
+) -> Signer {
+  Signer(
+    date_time: option.None,
+    access_key_id:,
+    secret_access_key:,
+    region:,
+    service:,
+  )
+}
+
+pub fn with_region(signer: Signer, region: String) -> Signer {
+  Signer(..signer, region:)
+}
+
+pub fn with_service(signer: Signer, service: String) -> Signer {
+  Signer(..signer, service:)
+}
+
+/// Set a specific time to use for request signing, overriding the default
+/// behaviour of using the current time.
+///
+pub fn with_date_time(signer: Signer, date_time: DateTime) -> Signer {
+  Signer(..signer, date_time: option.Some(date_time))
+}
+
+/// Sign a request that has a string body.
+///
+pub fn sign_string(
+  signer signer: Signer,
+  request request: Request(String),
+) -> Request(BitArray) {
+  sign_bits(signer, request.map(request, bit_array.from_string))
+}
+
+/// Sign a request that has a bit array body.
+///
+pub fn sign_bits(
+  signer signer: Signer,
+  request request: Request(BitArray),
 ) -> Request(BitArray) {
   let payload_hash =
     string.lowercase(
       bit_array.base16_encode(crypto.hash(crypto.Sha256, request.body)),
     )
 
-  let #(#(year, month, day), #(hour, minute, second)) = date_time
+  let #(#(year, month, day), #(hour, minute, second)) =
+    option.lazy_unwrap(signer.date_time, now)
+
   let date =
     string.concat([
       string.pad_left(int.to_string(year), 4, "0"),
@@ -79,7 +129,15 @@ pub fn sign(
       payload_hash,
     ])
 
-  let scope = string.concat([date, "/", region, "/", service, "/aws4_request"])
+  let scope =
+    string.concat([
+      date,
+      "/",
+      signer.region,
+      "/",
+      signer.service,
+      "/aws4_request",
+    ])
 
   let to_sign =
     string.concat([
@@ -97,10 +155,10 @@ pub fn sign(
     ])
 
   let key =
-    <<"AWS4":utf8, secret_access_key:utf8>>
+    <<"AWS4":utf8, signer.secret_access_key:utf8>>
     |> crypto.hmac(<<date:utf8>>, crypto.Sha256, _)
-    |> crypto.hmac(<<region:utf8>>, crypto.Sha256, _)
-    |> crypto.hmac(<<service:utf8>>, crypto.Sha256, _)
+    |> crypto.hmac(<<signer.region:utf8>>, crypto.Sha256, _)
+    |> crypto.hmac(<<signer.service:utf8>>, crypto.Sha256, _)
     |> crypto.hmac(<<"aws4_request":utf8>>, crypto.Sha256, _)
 
   let signature =
@@ -112,7 +170,7 @@ pub fn sign(
   let authorization =
     string.concat([
       "AWS4-HMAC-SHA256 Credential=",
-      access_key_id,
+      signer.access_key_id,
       "/",
       scope,
       ",SignedHeaders=" <> header_names <> ",Signature=",
@@ -123,3 +181,16 @@ pub fn sign(
 
   Request(..request, headers: headers)
 }
+
+fn now() -> DateTime {
+  system_time(1000) |> system_time_to_universal_time(1000)
+}
+
+@external(erlang, "os", "system_time")
+fn system_time(unit: Int) -> Int
+
+@external(erlang, "calendar", "system_time_to_universal_time")
+fn system_time_to_universal_time(
+  time: Int,
+  unit: Int,
+) -> #(#(Int, Int, Int), #(Int, Int, Int))

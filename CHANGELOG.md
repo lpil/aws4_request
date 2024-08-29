@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.0.0 - 2024-08-29
+
+- The API of the package has been changed.
+- The date time parameter is now optional, the current date is used if one is
+  not provided.
+
 ## v0.1.1 - 2024-08-29
 
 - Corrected a pub where requests with no path would not be signed correctly.
