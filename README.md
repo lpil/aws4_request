@@ -33,7 +33,6 @@ pub fn main() {
       region: "us-east-1",
       service: "iam",
     )
-    |> aws4_request.with_date_time(date_time)
     |> aws4_request.sign_bits(request)
 
   // Now send the signed request with a HTTP client
