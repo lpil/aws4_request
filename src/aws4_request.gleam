@@ -91,6 +91,12 @@ pub fn sign_bits(
       "Z",
     ])
 
+  let request =
+    request.set_header(request, "host", case request.port {
+      option.None -> request.host
+      option.Some(port) -> request.host <> ":" <> int.to_string(port)
+    })
+
   let method = string.uppercase(http.method_to_string(request.method))
   let headers =
     request.headers

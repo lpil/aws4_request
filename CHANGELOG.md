@@ -3,6 +3,7 @@
 ## v1.0.0 - 2024-08-29
 
 - The API of the package has been changed.
+- The `host` header is now set for you.
 - The date time parameter is now optional, the current date is used if one is
   not provided.
 
