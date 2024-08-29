@@ -1,9 +1,9 @@
+import gleam/bit_array
 import gleam/crypto
 import gleam/http
 import gleam/http/request.{type Request, Request}
 import gleam/int
 import gleam/list
-import gleam/bit_array
 import gleam/option
 import gleam/string
 
@@ -54,11 +54,16 @@ pub fn sign(
     |> list.map(fn(h) { h.0 })
     |> string.join(";")
 
+  let path = case request.path {
+    "" -> "/"
+    path -> path
+  }
+
   let canonical_request =
     string.concat([
       method,
       "\n",
-      request.path,
+      path,
       "\n",
       option.unwrap(request.query, ""),
       "\n",
