@@ -4,7 +4,7 @@ import gleam/http
 import gleam/http/request.{type Request, Request}
 import gleam/int
 import gleam/list
-import gleam/option.{type Option}
+import gleam/option.{type Option, None, Some}
 import gleam/string
 
 type DateTime =
@@ -17,6 +17,7 @@ pub type Signer {
     secret_access_key: String,
     region: String,
     service: String,
+    session_token: Option(String),
   )
 }
 
@@ -34,6 +35,7 @@ pub fn signer(
     secret_access_key:,
     region:,
     service:,
+    session_token: None,
   )
 }
 
@@ -43,6 +45,13 @@ pub fn with_region(signer: Signer, region: String) -> Signer {
 
 pub fn with_service(signer: Signer, service: String) -> Signer {
   Signer(..signer, service:)
+}
+
+/// Set a session token when using temporary security credentials.
+/// This sets the `x-amz-security-token` header.
+///
+pub fn with_session_token(signer: Signer, session_token: String) -> Signer {
+  Signer(..signer, session_token: Some(session_token))
 }
 
 /// Set a specific time to use for request signing, overriding the default
@@ -98,8 +107,10 @@ pub fn sign_bits(
     })
 
   let method = string.uppercase(http.method_to_string(request.method))
+
   let headers =
     request.headers
+    |> add_session_token_header(signer.session_token)
     |> list.prepend(#("x-amz-date", date_time))
     |> list.prepend(#("x-amz-content-sha256", payload_hash))
     |> list.map(fn(header) { #(string.lowercase(header.0), header.1) })
@@ -190,6 +201,14 @@ pub fn sign_bits(
 
 fn now() -> DateTime {
   system_time(1000) |> system_time_to_universal_time(1000)
+}
+
+fn add_session_token_header(headers, maybe_session_token) {
+  case maybe_session_token {
+    option.None -> headers
+    option.Some(session_token) ->
+      list.prepend(headers, #("x-amz-security-token", session_token))
+  }
 }
 
 @external(erlang, "os", "system_time")
