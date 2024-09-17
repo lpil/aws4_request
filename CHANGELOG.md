@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.1.0 - 2024-09-17
+
+- Added a convenience function for setting a session token for when using
+  temporary credentials.
+
 ## v1.0.0 - 2024-08-29
 
 - The API of the package has been changed.
