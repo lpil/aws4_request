@@ -5,10 +5,13 @@ authenticated requests to services such as AWS S3.
 
 [![Package Version](https://img.shields.io/hexpm/v/aws4_request)](https://hex.pm/packages/aws4_request)
 [![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/aws4_request/)
+![Erlang-compatible](https://img.shields.io/badge/target-erlang-a2003e)
+![JavaScript-compatible](https://img.shields.io/badge/target-javascript-f1e05a)
 
 ```sh
 gleam add aws4_request
 ```
+
 ```gleam
 import gleam/httpc
 import aws4_request
