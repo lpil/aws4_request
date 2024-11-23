@@ -199,6 +199,7 @@ pub fn sign_bits(
   Request(..request, headers: headers)
 }
 
+@external(javascript, "./now_ffi.mjs", "now")
 fn now() -> DateTime {
   system_time(1000) |> system_time_to_universal_time(1000)
 }

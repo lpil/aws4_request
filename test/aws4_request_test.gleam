@@ -1,7 +1,6 @@
 import aws4_request
 import gleam/http
 import gleam/http/request
-import gleam/option.{None, Some}
 import gleeunit
 import gleeunit/should
 
