@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.2.0 - 2024-11-25
+
+- Support for the JavaScript target added.
+
 ## v1.1.0 - 2024-09-17
 
 - Added a convenience function for setting a session token for when using
