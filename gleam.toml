@@ -1,5 +1,5 @@
 name = "aws4_request"
-version = "1.2.0"
+version = "1.2.1"
 gleam = ">= 1.4.0"
 description = "An AWS Signature Version 4 client implementation, used for S3 auth, etc"
 
@@ -9,7 +9,7 @@ links = [{ title = "Website", href = "https://gleam.run" }]
 
 [dependencies]
 gleam_stdlib = "~> 0.31 or ~> 1.0"
-gleam_http = "~> 3.5"
+gleam_http = ">= 3.5.0 and < 5.0.0"
 gleam_crypto = "~> 0.4 or ~> 1.0"
 
 [dev-dependencies]
