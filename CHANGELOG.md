@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.2.2 - Unreleased
+
+- Update standard lib to use new `string.pad_start` function.
+
 ## v1.2.1 - 2025-02-06
 
 - Relaxed the constraint for `gleam_http` to permit v4.
