@@ -86,17 +86,17 @@ pub fn sign_bits(
 
   let date =
     string.concat([
-      string.pad_left(int.to_string(year), 4, "0"),
-      string.pad_left(int.to_string(month), 2, "0"),
-      string.pad_left(int.to_string(day), 2, "0"),
+      string.pad_start(int.to_string(year), 4, "0"),
+      string.pad_start(int.to_string(month), 2, "0"),
+      string.pad_start(int.to_string(day), 2, "0"),
     ])
   let date_time =
     string.concat([
       date,
       "T",
-      string.pad_left(int.to_string(hour), 2, "0"),
-      string.pad_left(int.to_string(minute), 2, "0"),
-      string.pad_left(int.to_string(second), 2, "0"),
+      string.pad_start(int.to_string(hour), 2, "0"),
+      string.pad_start(int.to_string(minute), 2, "0"),
+      string.pad_start(int.to_string(second), 2, "0"),
       "Z",
     ])
 
