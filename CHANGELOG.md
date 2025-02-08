@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.2.2 - Unreleased
+## v1.2.2 - 2025-02-08
 
 - Update standard lib to use new `string.pad_start` function.
 
