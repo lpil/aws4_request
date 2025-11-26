@@ -9,14 +9,23 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        gleam: ["1.12", "1.13"]
+        otp: ["28.1"]
+        rebar3: ["3.25"]
+        include:
+          - gleam: "1.4.1"
+            otp: "26.0.2"
+            rebar3: "3.25"
     steps:
       - uses: actions/checkout@v3
       - uses: erlef/setup-beam@v1
         with:
-          otp-version: "26.0.2"
-          gleam-version: "1.4.1"
-          rebar3-version: "3"
-          # elixir-version: "1.15.4"
+          otp-version: ${{matrix.otp}}
+          gleam-version: ${{matrix.gleam}}
+          rebar3-version: ${{matrix.rebar3}}
       - run: gleam deps download
+      - run: gleam build --warnings-as-errors
       - run: gleam test
       - run: gleam format --check src test
