@@ -240,3 +240,58 @@ pub fn sign_no_host_test() {
     "AWS4-HMAC-SHA256 Credential=minioadmin/20240829/us-east-1/s3/aws4_request,SignedHeaders=host;x-amz-content-sha256;x-amz-date,Signature=524a2bfacb1bb9636a178879dac21e955479f4a2c01b00466d1a19568e5cc2a0",
   ))
 }
+
+pub fn sign_uncoded_path_test() {
+  let access_key_id = "minioadmin"
+  let secret_access_key = "miniopass"
+  let region = "us-east-1"
+  let service = "bedrock"
+  let date_time = #(#(2024, 08, 29), #(10, 33, 12))
+  let url =
+    "http://localhost:9000/model/anthropic.claude-3-7-sonnet-20250219-v1:0/invoke"
+  let input_headers = [#("host", "localhost:9000")]
+
+  let assert Ok(request) = request.to(url)
+  let request = request.Request(..request, headers: input_headers)
+  let request =
+    request
+    |> request.set_method(http.Post)
+    |> request.set_body(<<>>)
+
+  let signed_request =
+    aws4_request.signer(access_key_id:, secret_access_key:, region:, service:)
+    |> aws4_request.with_date_time(date_time)
+    |> aws4_request.sign_bits(request)
+
+  signed_request.body
+  |> should.equal(request.body)
+
+  signed_request.method
+  |> should.equal(request.method)
+
+  signed_request.path
+  |> should.equal(request.path)
+
+  signed_request.query
+  |> should.equal(request.query)
+
+  signed_request.scheme
+  |> should.equal(request.scheme)
+
+  signed_request.host
+  |> should.equal(request.host)
+
+  signed_request.port
+  |> should.equal(request.port)
+
+  request.get_header(signed_request, "host")
+  |> should.equal(Ok("localhost:9000"))
+
+  request.get_header(signed_request, "x-amz-date")
+  |> should.equal(Ok("20240829T103312Z"))
+
+  request.get_header(signed_request, "authorization")
+  |> should.equal(Ok(
+    "AWS4-HMAC-SHA256 Credential=minioadmin/20240829/us-east-1/bedrock/aws4_request,SignedHeaders=host;x-amz-content-sha256;x-amz-date,Signature=524a2bfacb1bb9636a178879dac21e955479f4a2c01b00466d1a19568e5cc2a0",
+  ))
+}
