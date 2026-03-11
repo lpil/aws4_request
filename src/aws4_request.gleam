@@ -5,7 +5,9 @@ import gleam/http/request.{type Request, Request}
 import gleam/int
 import gleam/list
 import gleam/option.{type Option, None, Some}
+import gleam/result
 import gleam/string
+import gleam/uri
 
 type DateTime =
   #(#(Int, Int, Int), #(Int, Int, Int))
@@ -121,26 +123,31 @@ pub fn sign_bits(
     |> list.map(fn(h) { h.0 })
     |> string.join(";")
 
-  let path = case request.path {
-    "" -> "/"
-    path -> path
-  }
+  let canonical_uri =
+    get_canonical_path(request.path, signer.service)
+    |> uri_encode()
+
+  let canonical_query =
+    request.query
+    |> option.unwrap("")
+    |> encode_query_string()
 
   let canonical_request =
     string.concat([
       method,
       "\n",
-      path,
+      canonical_uri,
       "\n",
-      option.unwrap(request.query, ""),
+      canonical_query,
       "\n",
       {
         headers
-        |> list.map(fn(h) { h.0 <> ":" <> h.1 })
+        |> list.map(fn(h) { h.0 <> ":" <> string.trim(h.1) })
         |> string.join("\n")
       },
       "\n",
       "\n",
+      // Note: AWS expects an extra newline after headers
       header_names,
       "\n",
       payload_hash,
@@ -172,15 +179,16 @@ pub fn sign_bits(
     ])
 
   let key =
-    <<"AWS4":utf8, signer.secret_access_key:utf8>>
-    |> crypto.hmac(<<date:utf8>>, crypto.Sha256, _)
+    crypto.hmac(<<date:utf8>>, crypto.Sha256, <<
+      "AWS4":utf8,
+      signer.secret_access_key:utf8,
+    >>)
     |> crypto.hmac(<<signer.region:utf8>>, crypto.Sha256, _)
     |> crypto.hmac(<<signer.service:utf8>>, crypto.Sha256, _)
     |> crypto.hmac(<<"aws4_request":utf8>>, crypto.Sha256, _)
 
   let signature =
-    <<to_sign:utf8>>
-    |> crypto.hmac(crypto.Sha256, key)
+    crypto.hmac(<<to_sign:utf8>>, crypto.Sha256, key)
     |> bit_array.base16_encode
     |> string.lowercase
 
@@ -197,6 +205,43 @@ pub fn sign_bits(
   let headers = [#("authorization", authorization), ..headers]
 
   Request(..request, headers: headers)
+}
+
+fn get_canonical_path(path: String, _service: String) -> String {
+  case path {
+    "" -> "/"
+    _ -> {
+      // S3 paths don't usually need additional stripping if you're 
+      // already passing the 'path' from the request object.
+      path
+    }
+  }
+}
+
+/// URI encodes the path while preserving slashes '/'
+pub fn uri_encode(path: String) -> String {
+  path
+  |> string.split(on: "/")
+  |> list.map(uri.percent_encode)
+  |> string.join(with: "/")
+}
+
+/// AWS SigV4 requires query params to be sorted and URI encoded
+fn encode_query_string(query: String) -> String {
+  case query {
+    "" -> ""
+    _ -> {
+      query
+      |> uri.parse_query()
+      |> result.unwrap([])
+      |> list.sort(fn(a, b) { string.compare(a.0, b.0) })
+      |> list.map(fn(pair) {
+        let #(k, v) = pair
+        uri.percent_encode(k) <> "=" <> uri.percent_encode(v)
+      })
+      |> string.join("&")
+    }
+  }
 }
 
 @external(javascript, "./now_ffi.mjs", "now")
