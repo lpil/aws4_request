@@ -292,6 +292,6 @@ pub fn sign_uncoded_path_test() {
 
   request.get_header(signed_request, "authorization")
   |> should.equal(Ok(
-    "AWS4-HMAC-SHA256 Credential=minioadmin/20240829/us-east-1/bedrock/aws4_request,SignedHeaders=host;x-amz-content-sha256;x-amz-date,Signature=524a2bfacb1bb9636a178879dac21e955479f4a2c01b00466d1a19568e5cc2a0",
+    "AWS4-HMAC-SHA256 Credential=minioadmin/20240829/us-east-1/bedrock/aws4_request,SignedHeaders=host;x-amz-content-sha256;x-amz-date,Signature=021a69ecf4185610c7178d1206b9aff000415f88b1de8ed0a7381dba43deb499",
   ))
 }

@@ -124,7 +124,7 @@ pub fn sign_bits(
     |> string.join(";")
 
   let canonical_uri =
-    get_canonical_path(request.path, signer.service)
+    get_canonical_path(request.path)
     |> uri_encode()
 
   let canonical_query =
@@ -147,7 +147,6 @@ pub fn sign_bits(
       },
       "\n",
       "\n",
-      // Note: AWS expects an extra newline after headers
       header_names,
       "\n",
       payload_hash,
@@ -179,16 +178,15 @@ pub fn sign_bits(
     ])
 
   let key =
-    crypto.hmac(<<date:utf8>>, crypto.Sha256, <<
-      "AWS4":utf8,
-      signer.secret_access_key:utf8,
-    >>)
+    <<"AWS4":utf8, signer.secret_access_key:utf8>>
+    |> crypto.hmac(<<date:utf8>>, crypto.Sha256, _)
     |> crypto.hmac(<<signer.region:utf8>>, crypto.Sha256, _)
     |> crypto.hmac(<<signer.service:utf8>>, crypto.Sha256, _)
     |> crypto.hmac(<<"aws4_request":utf8>>, crypto.Sha256, _)
 
   let signature =
-    crypto.hmac(<<to_sign:utf8>>, crypto.Sha256, key)
+    <<to_sign:utf8>>
+    |> crypto.hmac(crypto.Sha256, key)
     |> bit_array.base16_encode
     |> string.lowercase
 
@@ -207,19 +205,17 @@ pub fn sign_bits(
   Request(..request, headers: headers)
 }
 
-fn get_canonical_path(path: String, _service: String) -> String {
+fn get_canonical_path(path: String) -> String {
   case path {
     "" -> "/"
     _ -> {
-      // S3 paths don't usually need additional stripping if you're 
-      // already passing the 'path' from the request object.
       path
     }
   }
 }
 
-/// URI encodes the path while preserving slashes '/'
-pub fn uri_encode(path: String) -> String {
+/// URI encodes the path while preserving path separators
+fn uri_encode(path: String) -> String {
   path
   |> string.split(on: "/")
   |> list.map(uri.percent_encode)
