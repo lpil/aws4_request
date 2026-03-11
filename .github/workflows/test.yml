@@ -10,16 +10,13 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        gleam: ["1.12", "1.13"]
-        otp: ["28.1"]
-        rebar3: ["3.25"]
-        include:
-          - gleam: "1.4.1"
-            otp: "26.0.2"
-            rebar3: "3.25"
+        gleam: ["1.13", "1.14", "1.15.0-rc1"]
+        otp: ["28.2", "28.3", "28.4"]
+        rebar3: ["3.25"] 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{matrix.otp}}
