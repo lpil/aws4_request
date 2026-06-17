@@ -127,10 +127,7 @@ pub fn sign_bits(
     get_canonical_path(request.path)
     |> uri_encode()
 
-  let canonical_query =
-    request.query
-    |> option.unwrap("")
-    |> encode_query_string()
+  let canonical_query = encode_query_string(request.query)
 
   let canonical_request =
     string.concat([
@@ -223,21 +220,13 @@ fn uri_encode(path: String) -> String {
 }
 
 /// AWS SigV4 requires query params to be sorted and URI encoded
-fn encode_query_string(query: String) -> String {
-  case query {
-    "" -> ""
-    _ -> {
-      query
-      |> uri.parse_query()
-      |> result.unwrap([])
-      |> list.sort(fn(a, b) { string.compare(a.0, b.0) })
-      |> list.map(fn(pair) {
-        let #(k, v) = pair
-        uri.percent_encode(k) <> "=" <> uri.percent_encode(v)
-      })
-      |> string.join("&")
-    }
-  }
+fn encode_query_string(query: Option(String)) -> String {
+  query
+  |> option.unwrap("")
+  |> uri.parse_query()
+  |> result.unwrap([])
+  |> list.sort(fn(a, b) { string.compare(a.0, b.0) })
+  |> uri.query_to_string
 }
 
 @external(javascript, "./now_ffi.mjs", "now")
