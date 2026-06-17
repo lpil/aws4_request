@@ -2,7 +2,6 @@ import aws4_request
 import gleam/http
 import gleam/http/request
 import gleeunit
-import gleeunit/should
 
 pub fn main() {
   gleeunit.main()
@@ -32,41 +31,34 @@ pub fn sign_test() {
     |> aws4_request.with_date_time(date_time)
     |> aws4_request.sign_bits(request)
 
-  signed_request.body
-  |> should.equal(request.body)
+  assert signed_request.body == request.body
 
-  signed_request.method
-  |> should.equal(request.method)
+  assert signed_request.method == request.method
 
-  signed_request.path
-  |> should.equal(request.path)
+  assert signed_request.path == request.path
 
-  signed_request.query
-  |> should.equal(request.query)
+  assert signed_request.query == request.query
 
-  signed_request.scheme
-  |> should.equal(request.scheme)
+  assert signed_request.scheme == request.scheme
 
-  signed_request.host
-  |> should.equal(request.host)
+  assert signed_request.host == request.host
 
-  signed_request.port
-  |> should.equal(request.port)
+  assert signed_request.port == request.port
 
-  signed_request.headers
-  |> should.equal([
-    #(
-      "authorization",
-      "AWS4-HMAC-SHA256 Credential=AKIDEXAMPLE/20150830/us-east-1/iam/aws4_request,SignedHeaders=content-type;host;x-amz-content-sha256;x-amz-date,Signature=dd479fa8a80364edf2119ec24bebde66712ee9c9cb2b0d92eb3ab9ccdc0c3947",
-    ),
-    #("content-type", "application/x-www-form-urlencoded; charset=utf-8"),
-    #("host", "iam.amazonaws.com"),
-    #(
-      "x-amz-content-sha256",
-      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    ),
-    #("x-amz-date", "20150830T123600Z"),
-  ])
+  assert signed_request.headers
+    == [
+      #(
+        "authorization",
+        "AWS4-HMAC-SHA256 Credential=AKIDEXAMPLE/20150830/us-east-1/iam/aws4_request,SignedHeaders=content-type;host;x-amz-content-sha256;x-amz-date,Signature=dd479fa8a80364edf2119ec24bebde66712ee9c9cb2b0d92eb3ab9ccdc0c3947",
+      ),
+      #("content-type", "application/x-www-form-urlencoded; charset=utf-8"),
+      #("host", "iam.amazonaws.com"),
+      #(
+        "x-amz-content-sha256",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      ),
+      #("x-amz-date", "20150830T123600Z"),
+    ]
 }
 
 pub fn sign_with_session_token_test() {
@@ -95,42 +87,35 @@ pub fn sign_with_session_token_test() {
     |> aws4_request.with_session_token(session_token)
     |> aws4_request.sign_bits(request)
 
-  signed_request.body
-  |> should.equal(request.body)
+  assert signed_request.body == request.body
 
-  signed_request.method
-  |> should.equal(request.method)
+  assert signed_request.method == request.method
 
-  signed_request.path
-  |> should.equal(request.path)
+  assert signed_request.path == request.path
 
-  signed_request.query
-  |> should.equal(request.query)
+  assert signed_request.query == request.query
 
-  signed_request.scheme
-  |> should.equal(request.scheme)
+  assert signed_request.scheme == request.scheme
 
-  signed_request.host
-  |> should.equal(request.host)
+  assert signed_request.host == request.host
 
-  signed_request.port
-  |> should.equal(request.port)
+  assert signed_request.port == request.port
 
-  signed_request.headers
-  |> should.equal([
-    #(
-      "authorization",
-      "AWS4-HMAC-SHA256 Credential=AKIDEXAMPLE/20150830/us-east-1/iam/aws4_request,SignedHeaders=content-type;host;x-amz-content-sha256;x-amz-date;x-amz-security-token,Signature=5f5383bc82b5a1a7f3b4d6cf0fb4c1ed6cf79269de64111085f95738c5c5e137",
-    ),
-    #("content-type", "application/x-www-form-urlencoded; charset=utf-8"),
-    #("host", "iam.amazonaws.com"),
-    #(
-      "x-amz-content-sha256",
-      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    ),
-    #("x-amz-date", "20150830T123600Z"),
-    #("x-amz-security-token", session_token),
-  ])
+  assert signed_request.headers
+    == [
+      #(
+        "authorization",
+        "AWS4-HMAC-SHA256 Credential=AKIDEXAMPLE/20150830/us-east-1/iam/aws4_request,SignedHeaders=content-type;host;x-amz-content-sha256;x-amz-date;x-amz-security-token,Signature=5f5383bc82b5a1a7f3b4d6cf0fb4c1ed6cf79269de64111085f95738c5c5e137",
+      ),
+      #("content-type", "application/x-www-form-urlencoded; charset=utf-8"),
+      #("host", "iam.amazonaws.com"),
+      #(
+        "x-amz-content-sha256",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      ),
+      #("x-amz-date", "20150830T123600Z"),
+      #("x-amz-security-token", session_token),
+    ]
 }
 
 pub fn sign_no_path_test() {
@@ -154,37 +139,29 @@ pub fn sign_no_path_test() {
     |> aws4_request.with_date_time(date_time)
     |> aws4_request.sign_bits(request)
 
-  signed_request.body
-  |> should.equal(request.body)
+  assert signed_request.body == request.body
 
-  signed_request.method
-  |> should.equal(request.method)
+  assert signed_request.method == request.method
 
-  signed_request.path
-  |> should.equal(request.path)
+  assert signed_request.path == request.path
 
-  signed_request.query
-  |> should.equal(request.query)
+  assert signed_request.query == request.query
 
-  signed_request.scheme
-  |> should.equal(request.scheme)
+  assert signed_request.scheme == request.scheme
 
-  signed_request.host
-  |> should.equal(request.host)
+  assert signed_request.host == request.host
 
-  signed_request.port
-  |> should.equal(request.port)
+  assert signed_request.port == request.port
 
-  request.get_header(signed_request, "host")
-  |> should.equal(Ok("localhost:9000"))
+  assert request.get_header(signed_request, "host") == Ok("localhost:9000")
 
-  request.get_header(signed_request, "x-amz-date")
-  |> should.equal(Ok("20240829T103312Z"))
+  assert request.get_header(signed_request, "x-amz-date")
+    == Ok("20240829T103312Z")
 
-  request.get_header(signed_request, "authorization")
-  |> should.equal(Ok(
-    "AWS4-HMAC-SHA256 Credential=minioadmin/20240829/us-east-1/s3/aws4_request,SignedHeaders=host;x-amz-content-sha256;x-amz-date,Signature=524a2bfacb1bb9636a178879dac21e955479f4a2c01b00466d1a19568e5cc2a0",
-  ))
+  assert request.get_header(signed_request, "authorization")
+    == Ok(
+      "AWS4-HMAC-SHA256 Credential=minioadmin/20240829/us-east-1/s3/aws4_request,SignedHeaders=host;x-amz-content-sha256;x-amz-date,Signature=524a2bfacb1bb9636a178879dac21e955479f4a2c01b00466d1a19568e5cc2a0",
+    )
 }
 
 pub fn sign_no_host_test() {
@@ -208,37 +185,29 @@ pub fn sign_no_host_test() {
     |> aws4_request.with_date_time(date_time)
     |> aws4_request.sign_bits(request)
 
-  signed_request.body
-  |> should.equal(request.body)
+  assert signed_request.body == request.body
 
-  signed_request.method
-  |> should.equal(request.method)
+  assert signed_request.method == request.method
 
-  signed_request.path
-  |> should.equal(request.path)
+  assert signed_request.path == request.path
 
-  signed_request.query
-  |> should.equal(request.query)
+  assert signed_request.query == request.query
 
-  signed_request.scheme
-  |> should.equal(request.scheme)
+  assert signed_request.scheme == request.scheme
 
-  signed_request.host
-  |> should.equal(request.host)
+  assert signed_request.host == request.host
 
-  signed_request.port
-  |> should.equal(request.port)
+  assert signed_request.port == request.port
 
-  request.get_header(signed_request, "host")
-  |> should.equal(Ok("localhost:9000"))
+  assert request.get_header(signed_request, "host") == Ok("localhost:9000")
 
-  request.get_header(signed_request, "x-amz-date")
-  |> should.equal(Ok("20240829T103312Z"))
+  assert request.get_header(signed_request, "x-amz-date")
+    == Ok("20240829T103312Z")
 
-  request.get_header(signed_request, "authorization")
-  |> should.equal(Ok(
-    "AWS4-HMAC-SHA256 Credential=minioadmin/20240829/us-east-1/s3/aws4_request,SignedHeaders=host;x-amz-content-sha256;x-amz-date,Signature=524a2bfacb1bb9636a178879dac21e955479f4a2c01b00466d1a19568e5cc2a0",
-  ))
+  assert request.get_header(signed_request, "authorization")
+    == Ok(
+      "AWS4-HMAC-SHA256 Credential=minioadmin/20240829/us-east-1/s3/aws4_request,SignedHeaders=host;x-amz-content-sha256;x-amz-date,Signature=524a2bfacb1bb9636a178879dac21e955479f4a2c01b00466d1a19568e5cc2a0",
+    )
 }
 
 pub fn sign_uncoded_path_test() {
@@ -263,35 +232,27 @@ pub fn sign_uncoded_path_test() {
     |> aws4_request.with_date_time(date_time)
     |> aws4_request.sign_bits(request)
 
-  signed_request.body
-  |> should.equal(request.body)
+  assert signed_request.body == request.body
 
-  signed_request.method
-  |> should.equal(request.method)
+  assert signed_request.method == request.method
 
-  signed_request.path
-  |> should.equal(request.path)
+  assert signed_request.path == request.path
 
-  signed_request.query
-  |> should.equal(request.query)
+  assert signed_request.query == request.query
 
-  signed_request.scheme
-  |> should.equal(request.scheme)
+  assert signed_request.scheme == request.scheme
 
-  signed_request.host
-  |> should.equal(request.host)
+  assert signed_request.host == request.host
 
-  signed_request.port
-  |> should.equal(request.port)
+  assert signed_request.port == request.port
 
-  request.get_header(signed_request, "host")
-  |> should.equal(Ok("localhost:9000"))
+  assert request.get_header(signed_request, "host") == Ok("localhost:9000")
 
-  request.get_header(signed_request, "x-amz-date")
-  |> should.equal(Ok("20240829T103312Z"))
+  assert request.get_header(signed_request, "x-amz-date")
+    == Ok("20240829T103312Z")
 
-  request.get_header(signed_request, "authorization")
-  |> should.equal(Ok(
-    "AWS4-HMAC-SHA256 Credential=minioadmin/20240829/us-east-1/bedrock/aws4_request,SignedHeaders=host;x-amz-content-sha256;x-amz-date,Signature=021a69ecf4185610c7178d1206b9aff000415f88b1de8ed0a7381dba43deb499",
-  ))
+  assert request.get_header(signed_request, "authorization")
+    == Ok(
+      "AWS4-HMAC-SHA256 Credential=minioadmin/20240829/us-east-1/bedrock/aws4_request,SignedHeaders=host;x-amz-content-sha256;x-amz-date,Signature=021a69ecf4185610c7178d1206b9aff000415f88b1de8ed0a7381dba43deb499",
+    )
 }
