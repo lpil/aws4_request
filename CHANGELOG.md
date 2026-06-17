@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.2.3 - 2026-06-17
+
+- Corrected handling of header order and path encoding.
+
 ## v1.2.2 - 2025-02-08
 
 - Update standard lib to use new `string.pad_start` function.
